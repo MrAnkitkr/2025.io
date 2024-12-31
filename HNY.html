@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year!</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('b.jpg') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin: 10px 0;
+        }
+        p {
+            font-size: 1rem;
+            margin: 10px;
+            padding: 0 20px;
+        }
+        #countdown {
+            font-size: 1.5rem;
+            margin: 10px 0;
+        }
+        button {
+            background: #ff6b6b;
+            border: none;
+            padding: 10px 20px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #ff4757;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            transform: rotate(-45deg);
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            animation: floatHeart 5s linear infinite;
+        }
+        @keyframes floatHeart {
+            0% {
+                transform: translateY(100vh) scale(0.5) rotate(-45deg);
+                opacity: 1;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.5) rotate(-45deg);
+                opacity: 0;
+            }
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            p {
+                font-size: 0.9rem;
+            }
+            #countdown {
+                font-size: 1.2rem;
+            }
+            button {
+                font-size: 0.9rem;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Happy New Year, My Mumu... 🎉</h1>
+    <p>“Every moment with you feels like an eternity of happiness.”</p>
+    <div id="countdown">Countdown: 00:00:00</div>
+    <button onclick="startFireworks()">Click Me for a Surprise!</button>
+    <canvas id="fireworks"></canvas>
+
+    <script>
+        // Countdown Timer
+        const countdownElement = document.getElementById('countdown');
+        const newYear = new Date(new Date().getFullYear() + 1, 0, 1);
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = newYear - now;
+
+            const hours = String(Math.floor((diff / (1000 * 60 * 60)) % 24)).padStart(2, '0');
+            const minutes = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+            const seconds = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+
+            countdownElement.textContent = `Countdown: ${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateCountdown, 1000);
+
+        // Fireworks Animation
+        const canvas = document.getElementById('fireworks');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles = [];
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.size = random(2, 5);
+                this.speedX = random(-3, 3);
+                this.speedY = random(-3, 3);
+                this.opacity = 1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.opacity -= 0.02;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function createFirework(x, y) {
+            const colors = ['#ff6b6b', '#ffe66d', '#6bc5d2', '#a29bfe'];
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+                if (particles[i].opacity <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        function startFireworks() {
+            createFirework(canvas.width / 2, canvas.height / 2);
+        }
+
+        animate();
+
+        // Continuous Heart Animation
+        setInterval(() => {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.style.left = `${Math.random() * window.innerWidth}px`;
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 5000);
+        }, 300);
+        
+    </script>
+</body>
+</html>
